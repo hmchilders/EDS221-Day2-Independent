@@ -1,0 +1,95 @@
+---
+title: "Wild Data"
+author: "Heather"
+format: html
+editor: visual
+
+execute: 
+  warning: false
+  echo: true
+---
+
+## Wild Data
+
+```{r}
+library(tidyverse)
+library(janitor)
+library(here)
+
+```
+
+```{r}
+mack_verts <- read_csv(here("data", "AS00601.csv")) %>% 
+  janitor::clean_names()
+
+# View(mack_verts)
+```
+
+Accessing Data Practice
+
+```{r}
+# mack_verts$weight
+weights <- purrr::pluck(mack_verts, "weight")
+mc_weight_5 <- purrr::pluck(mack_verts, "weight", 5)
+mc_weight_5
+
+mc_length_8_20 <- mack_verts$length1[8:20]
+mc_length_8_20
+
+mc_dates <- mack_verts$sampledate
+# mc_dates
+```
+
+Salamander Subset
+
+```{r}
+
+mc_salamanders <- mack_verts %>% 
+  filter(species == "DITE")
+
+mc_salamanders
+
+```
+
+```{r}
+ggplot(data = mc_salamanders, aes(x = length1, y = weight))+
+  geom_point(aes(color = year),
+             alpha = 0.5)+
+  labs(
+    title = "Salamander Data",
+    x = "Snout-vent Length (mm)",
+    y = "Weight (grams)",
+    caption = "Gregory, S.V. and I. Arismendi. 2020. 
+    Aquatic Vertebrate Population Study in Mack Creek, Andrews Experimental Forest, 
+    1987 to present ver 14. Environmental Data Initiative. 
+    https://doi.org/10.6073/pasta/7c78d662e847cdbe33584add8f809165 (Accessed 2023-08-15).",
+    subtitle = "Subset of mack_vert Data"
+  )+
+  theme_dark()
+```
+
+```{r}
+ggsave(filename = here("figures","salamander_size.png"))
+```
+
+Scatterplot cutthroat
+
+```{r}
+mc_trout <- mack_verts %>% 
+  filter(species == "ONCL")
+
+ggplot(mc_trout, aes(x = length1, y = weight))+
+  geom_point(aes(color = reach))+
+  scale_color_manual(values = c("pink", "navy", "gray50"))+
+  theme_light()+
+  labs(
+    title = "Trout Data",
+    x = "length(mm)",
+    y= "weight(grams)",
+  )+
+  facet_wrap(facets = "reach")
+```
+
+```{r}
+ggsave(filename = here("figures", "cutthroat_size.png"))
+```
